@@ -1,6 +1,7 @@
 import sqlite3
 import os
 from cryptography.fernet import Fernet
+import pyperclip
 
 KEY_FILE = "secret.key"
 if not os.path.exists(KEY_FILE):
@@ -39,8 +40,12 @@ def get_credential(key, field):
         password = cipher.decrypt(encrypted_password).decode()
         if field == "em":
             print(f"Email: {email}")
+            pyperclip.copy(email)
+            print("Email copied to clipboard.")
         elif field == "pw":
             print(f"Password: {password}")
+            pyperclip.copy(password)
+            print("Password copied to clipboard.")
         else:
             print("Invalid field. Use 'em' for email or 'pw' for password.")
     else:
