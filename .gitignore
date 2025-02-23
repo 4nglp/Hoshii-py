@@ -4,3 +4,7 @@ dist/
 build/
 *.exe
 *.spec
+*.zip
+*.pyz
+*.pkg
+*.toc

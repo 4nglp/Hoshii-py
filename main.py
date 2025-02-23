@@ -44,6 +44,17 @@ def get_credential(identifier, field):
     else:
         print("No credential found for this identifier and field.")
 
+def list_credentials():
+    cursor.execute("SELECT DISTINCT identifier FROM credentials")
+    results = cursor.fetchall()
+    if results:
+        print("\nStored Credentials:")
+        for row in results:
+            print(f"Identifier: {row[0]}")
+        print()
+    else:
+        print("No credentials found.")
+
 def main():
     while True:
         command = input("Enter command: ")
@@ -56,12 +67,15 @@ def main():
         elif parts[0] == "get" and len(parts) == 3:
             _, identifier, field = parts
             get_credential(identifier, field)
+        elif parts[0] == "list":
+            list_credentials()
         elif command == "exit":
             break
         else:
             print("Invalid command format. Use:")
             print("  'set <identifier> <field> <value>' to store a credential")
             print("  'get <identifier> <field>' to retrieve a credential")
+            print("  'list' to show all stored credentials")
 
 if __name__ == "__main__":
     main()
