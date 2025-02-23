@@ -1,2 +1,6 @@
 *.db
 *.key
+dist/
+build/
+*.exe
+*.spec
