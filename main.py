@@ -1,5 +1,7 @@
 import sqlite3
 import os
+import string
+import secrets
 from cryptography.fernet import Fernet
 import pyperclip
 
@@ -50,10 +52,17 @@ def list_credentials():
     if results:
         print("\nStored Credentials:")
         for row in results:
-            print(f"Identifier: {row[0]}")
+            print(f"{row[0]}")
         print()
     else:
         print("No credentials found.")
+
+def generate_password(length=16):
+    characters = string.ascii_letters + string.digits + string.punctuation
+    password = ''.join(secrets.choice(characters) for _ in range(length))
+    pyperclip.copy(password)
+    print("Password copied to clipboard.")
+    return password
 
 def main():
     while True:
@@ -67,6 +76,8 @@ def main():
         elif parts[0] == "get" and len(parts) == 3:
             _, identifier, field = parts
             get_credential(identifier, field)
+        elif parts[0] == "generate":
+            print(generate_password())
         elif parts[0] == "list":
             list_credentials()
         elif command == "exit":
