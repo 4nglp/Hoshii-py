@@ -46,6 +46,13 @@ def get_credential(identifier, field):
     else:
         print("No credential found for this identifier and field.")
 
+def update_credential(identifier, field, value):
+    encrypted_value = cipher.encrypt(value.encode())
+    cursor.execute("UPDATE credentials SET value = ? WHERE identifier = ? AND field = ?", 
+                   (encrypted_value, identifier, field))
+    conn.commit()
+    print("Credential updated successfully!")
+
 def list_credentials():
     cursor.execute("SELECT DISTINCT identifier FROM credentials")
     results = cursor.fetchall()
@@ -76,6 +83,9 @@ def main():
         elif parts[0] == "get" and len(parts) == 3:
             _, identifier, field = parts
             get_credential(identifier, field)
+        elif parts[0] == "update" and len(parts) == 4:
+            _, identifier, field, value = parts
+            update_credential(identifier, field, value)
         elif parts[0] == "generate":
             print(generate_password())
         elif parts[0] == "list":
@@ -87,6 +97,7 @@ def main():
             print("  'set <identifier> <field> <value>' to store a credential")
             print("  'get <identifier> <field>' to retrieve a credential")
             print("  'list' to show all stored credentials")
+            print("  'generate' to generate a random strong password")
 
 if __name__ == "__main__":
     main()
