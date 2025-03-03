@@ -5,7 +5,17 @@ import secrets
 from cryptography.fernet import Fernet
 import pyperclip
 
-KEY_FILE = "secret.key"
+if os.name == 'nt':
+    app_data = os.environ['LOCALAPPDATA']
+else:  
+    app_data = os.path.expanduser('~/.config')
+
+APP_FOLDER = os.path.join(app_data, "Hoshii")
+os.makedirs(APP_FOLDER, exist_ok=True)
+
+KEY_FILE = os.path.join(APP_FOLDER, "secret.key")
+DB_FILE = os.path.join(APP_FOLDER, "main.db")
+
 if not os.path.exists(KEY_FILE):
     with open(KEY_FILE, "wb") as key_file:
         key_file.write(Fernet.generate_key())
@@ -14,7 +24,7 @@ with open(KEY_FILE, "rb") as key_file:
     KEY = key_file.read()
 cipher = Fernet(KEY)
 
-conn = sqlite3.connect("main.db")
+conn = sqlite3.connect(DB_FILE)
 cursor = conn.cursor()
 
 cursor.execute("""
