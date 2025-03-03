@@ -22,17 +22,21 @@ CREATE TABLE IF NOT EXISTS credentials (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     identifier TEXT NOT NULL,
     field TEXT NOT NULL,
-    value TEXT NOT NULL
+    value TEXT NOT NULL,
+    UNIQUE(identifier, field)
 )
 """)
 conn.commit()
 
 def add_credential(identifier, field, value):
     encrypted_value = cipher.encrypt(value.encode())
-    cursor.execute("INSERT INTO credentials (identifier, field, value) VALUES (?, ?, ?)",
-                   (identifier, field, encrypted_value))
-    conn.commit()
-    print("Credential saved successfully!")
+    try:
+        cursor.execute("INSERT INTO credentials (identifier, field, value) VALUES (?, ?, ?)",
+                       (identifier, field, encrypted_value))
+        conn.commit()
+        print("Credential saved successfully!")
+    except sqlite3.IntegrityError:
+        print("Error: A credential with this identifier and field already exists.")
 
 def get_credential(identifier, field):
     cursor.execute("SELECT value FROM credentials WHERE identifier = ? AND field = ?", (identifier, field))
@@ -51,7 +55,10 @@ def update_credential(identifier, field, value):
     cursor.execute("UPDATE credentials SET value = ? WHERE identifier = ? AND field = ?", 
                    (encrypted_value, identifier, field))
     conn.commit()
-    print("Credential updated successfully!")
+    if cursor.rowcount == 0:
+        print("No credential found to update.")
+    else:
+        print("Credential updated successfully!")
 
 def list_credentials():
     cursor.execute("SELECT DISTINCT identifier FROM credentials")
@@ -96,6 +103,7 @@ def main():
             print("Invalid command format. Use:")
             print("  'set <identifier> <field> <value>' to store a credential")
             print("  'get <identifier> <field>' to retrieve a credential")
+            print("  'update <identifier> <field> <value>' to update a credential")
             print("  'list' to show all stored credentials")
             print("  'generate' to generate a random strong password")
 
